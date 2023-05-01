@@ -70,8 +70,10 @@ loop do
 
   user_ids.each do |user_id|
     begin
-pp recording_pids
-pp pid_watchers
+# pp recording_pids
+# pp pid_watchers
+$stdout.flush
+
       user = get_json("/users/#{user_id}")
       user => {user: {id:, screen_id:, name:, is_live:, last_movie_id:}}
       if !is_live
