@@ -74,7 +74,10 @@ pp recording_pids
 pp pid_watchers
       user = get_json("/users/#{user_id}")
       user => {user: {id:, screen_id:, name:, is_live:, last_movie_id:}}
-      next if !is_live
+      if !is_live
+        sleep(SLEEP_SEC_PER_USER)
+        next
+      end
 
       # ライブ情報取得
       # ライブ終了する瞬間だと404になり得るが、他の通信エラーとまとめてrescueで拾う
