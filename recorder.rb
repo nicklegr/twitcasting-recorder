@@ -52,6 +52,12 @@ def get_json(uri, header = {}, params = {}, body = "")
   JSON.parse(body, symbolize_names: true)
 end
 
+def get_hls_url(api_hls_url)
+  body = Https.get(api_hls_url, {})
+  m = body.match(%r|https://(.+)/ts-\d+.m3u8|)
+  "https://#{m[1]}/ts-source.m3u8"
+end
+
 Dotenv.load
 
 option = Option.new
@@ -103,7 +109,7 @@ $stdout.flush
           "-loglevel",
           "warning",
           "-i",
-          hls_url,
+          get_hls_url(hls_url),
           "-c",
           "copy",
           video_filename
