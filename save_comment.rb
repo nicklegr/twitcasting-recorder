@@ -28,6 +28,12 @@ slice_id = nil
 
 loop do
   begin
+    # 配信終了チェック
+    live = get_json("/movies/#{movie_id}")
+    live => {movie: {is_live:}}
+    exit(0) unless is_live
+
+    # コメント取得
     params = {
       "limit" => "50",
       "slice_id" => slice_id || "1", # このコメントID以降のコメントを取得(指定したIDは含まない)
