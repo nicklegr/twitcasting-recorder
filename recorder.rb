@@ -97,19 +97,20 @@ $stdout.flush
       end
 
       # ライブ情報取得
-      # ライブ終了する瞬間だと404になり得るが、他の通信エラーとまとめてrescueで拾う
+      # ライブ終了する瞬間だと404になるかもしれないが、他の通信エラーとまとめてrescueで拾う
       live = get_json("/movies/#{last_movie_id}")
       live => {movie: {title:, subtitle:, large_thumbnail:, hls_url:}}
 
       dir = "#{option.rec_dir_name}/#{screen_id}-#{id}"
       FileUtils.mkdir_p(dir)
       time_str = Time.now.strftime("%Y%m%d_%H%M%S")
+      file_name_base = "#{dir}/" + sanitize_filename("#{time_str}-#{name}-#{last_movie_id}-#{title}-#{subtitle}")
 
       # 録画中かチェック
       watcher = pid_watchers.dig(last_movie_id, "video")
       if !watcher || !watcher.status
         # 録画開始
-        video_filename = "#{dir}/" + sanitize_filename("#{time_str}-#{name}-#{last_movie_id}-#{title}-#{subtitle}.ts")
+        video_filename = "#{file_name_base}.ts"
         playlist_url = get_hls_url(hls_url)
         puts "recording video '#{video_filename}'"
         puts "playlist: #{playlist_url}"
@@ -130,6 +131,27 @@ $stdout.flush
         pid_watchers[last_movie_id]["video"] = Process.detach(video_recorder_pid)
       else
         puts "already recording video: #{screen_id} (movie_id: #{last_movie_id}, pid: #{recording_pids[last_movie_id]["video"]})"
+      end
+
+      # コメント保存中かチェック
+      watcher = pid_watchers.dig(last_movie_id, "comment")
+      if !watcher || !watcher.status
+        # 保存開始
+        puts "saving comment '#{file_name_base}.txt/jsonl'"
+
+        comment_recorder_pid = spawn(
+          "bundle",
+          "exec",
+          "ruby",
+          "save_comment.rb",
+          last_movie_id,
+          file_name_base,
+        )
+
+        recording_pids[last_movie_id]["comment"] = comment_recorder_pid
+        pid_watchers[last_movie_id]["comment"] = Process.detach(comment_recorder_pid)
+      else
+        puts "already saving comment: #{screen_id} (movie_id: #{last_movie_id}, pid: #{recording_pids[last_movie_id]["comment"]})"
       end
     rescue Net::HTTPExceptions => e
       puts e.message
