@@ -21,8 +21,9 @@ end
 Dotenv.load
 Encoding.default_external = Encoding::UTF_8
 
-movie_id = ARGV[0]
+raise "usage: #{__FILE__} <movie_id> <base_file_name>" if ARGV.size != 2
 
+movie_id, base_file_name = ARGV
 slice_id = nil
 
 loop do
@@ -51,11 +52,11 @@ loop do
 
     jsonl_comments = comments.map{|e| e.to_json}
 
-    File.open("comments_#{movie_id}.txt", "a") do |file|
+    File.open("#{base_file_name}.txt", "a") do |file|
       file.puts(text_comments.join("\n"))
     end
 
-    File.open("comments_#{movie_id}.jsonl", "a") do |file|
+    File.open("#{base_file_name}.jsonl", "a") do |file|
       file.puts(jsonl_comments.join("\n"))
     end
   rescue Net::HTTPExceptions => e
