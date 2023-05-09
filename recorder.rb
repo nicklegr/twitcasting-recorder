@@ -22,7 +22,7 @@ def ffmpeg_path
 end
 
 def sanitize_filename(file)
-  file.gsub(%r![/\\?*:|"<>]!, "")
+  file.gsub(%r![/\\?*:|"<>]!, "_")
 end
 
 class Option
@@ -101,7 +101,7 @@ $stdout.flush
       live = get_json("/movies/#{last_movie_id}")
       live => {movie: {title:, subtitle:, large_thumbnail:, hls_url:}}
 
-      dir = "#{option.rec_dir_name}/#{screen_id}-#{id}"
+      dir = "#{option.rec_dir_name}/" + sanitize_filename("#{screen_id}-#{id}")
       FileUtils.mkdir_p(dir)
       time_str = Time.now.strftime("%Y%m%d_%H%M%S")
       file_name_base = "#{dir}/" + sanitize_filename("#{time_str}-#{name}-#{last_movie_id}-#{title}-#{subtitle}")
