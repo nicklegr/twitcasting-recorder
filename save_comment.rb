@@ -6,6 +6,7 @@ require_relative "https"
 
 API_BASE_URI = "https://apiv2.twitcasting.tv"
 SLEEP_SEC = 3.0
+SLEEP_SEC_RATE_LIMIT = 10
 
 def get_json(uri, header = {}, params = {}, body = "")
   common_header = {
@@ -66,13 +67,28 @@ loop do
       file.puts(jsonl_comments.join("\n"))
     end
   rescue Net::HTTPExceptions => e
-    # エラーが起きても続行
+    begin
+      body = JSON.parse(e.response.body, symbolize_names: true)
+      if e.response.code == "403" &&
+        body in { error: { code: 2000 }}
+        # レートリミットの場合は少し時間を空けて続行
+        # 403 "Forbidden"
+        # {"error":{"code":2000,"message":"Execution count limitation"}}
+        puts "rate limit reached, sleeping #{SLEEP_SEC_RATE_LIMIT} sec"
+        sleep(SLEEP_SEC_RATE_LIMIT)
+        next
+      end
+    rescue JSON::ParserError
+    end
+
     puts e.message
     puts e.response.body
     puts e.backtrace
+    exit(1)
   rescue => e
     puts e.message
     puts e.backtrace
+    exit(1)
   end
 
   sleep(SLEEP_SEC)
