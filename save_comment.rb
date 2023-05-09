@@ -59,7 +59,8 @@ loop do
     text_comments = comments.map do |e|
       e => { created:, message:, from_user: { screen_id: }}
       time_str = Time.at(created).strftime("%Y/%m/%d %H:%M:%S")
-      "[#{time_str}] #{message} (#{screen_id})"
+      message_oneline = message.gsub("\n", " ")
+      "[#{time_str}] #{message_oneline} (#{screen_id})"
     end
 
     jsonl_comments = comments.map{|e| e.to_json}
