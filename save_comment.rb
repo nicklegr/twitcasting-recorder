@@ -26,13 +26,18 @@ raise "usage: #{__FILE__} <movie_id> <base_file_name>" if ARGV.size != 2
 
 movie_id, base_file_name = ARGV
 slice_id = nil
+loop_count = 0
 
 loop do
+  loop_count += 1
+
   begin
     # 配信終了チェック
-    live = get_json("/movies/#{movie_id}")
-    live => {movie: {is_live:}}
-    exit(0) unless is_live
+    if loop_count % 60 == 0
+      live = get_json("/movies/#{movie_id}")
+      live => {movie: {is_live:}}
+      exit(0) unless is_live
+    end
 
     # コメント取得
     params = {
