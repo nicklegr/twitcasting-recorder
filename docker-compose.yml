@@ -10,3 +10,14 @@ services:
     volumes:
       - ./conf:/conf
       - $OUTPUT_DIR:/output
+
+  authenticator:
+    build: .
+    command: bundle exec ruby web.rb -e production
+    ports:
+      - "4567:4567"
+    environment:
+      CLIENT_ID: $CLIENT_ID
+      CLIENT_SECRET: $CLIENT_SECRET
+      REDIRECT_URI: $REDIRECT_URI
+    restart: unless-stopped

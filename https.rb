@@ -37,7 +37,7 @@ class Https
       req = Net::HTTP::Post.new(uri, header)
       req["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
       req.set_form_data(params)
-      req.body = body
+      req.body = body unless body.empty?
       http.request(req)
     end
 
@@ -46,6 +46,7 @@ class Https
       res.body
     else
       # レスポンスが 2xx(成功)でなかった場合に、対応する例外を発生させます。
+      puts res.body
       res.value
     end
   end

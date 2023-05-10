@@ -2,13 +2,40 @@ GEM
   remote: https://rubygems.org/
   specs:
     coderay (1.1.3)
+    daemons (1.4.1)
     dotenv (2.8.1)
+    eventmachine (1.2.7)
     method_source (1.0.0)
+    multi_json (1.15.0)
+    mustermann (3.0.0)
+      ruby2_keywords (~> 0.0.1)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
     pry-nav (1.0.0)
       pry (>= 0.9.10, < 0.15)
+    rack (2.2.7)
+    rack-protection (3.0.6)
+      rack
+    ruby2_keywords (0.0.5)
+    sinatra (3.0.6)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.0.6)
+      tilt (~> 2.0)
+    sinatra-contrib (3.0.6)
+      multi_json
+      mustermann (~> 3.0)
+      rack-protection (= 3.0.6)
+      sinatra (= 3.0.6)
+      tilt (~> 2.0)
+    sinatra-reloader (1.0)
+      sinatra-contrib
+    thin (1.8.2)
+      daemons (~> 1.0, >= 1.0.9)
+      eventmachine (~> 1.0, >= 1.0.4)
+      rack (>= 1, < 3)
+    tilt (2.1.0)
 
 PLATFORMS
   x86_64-linux
@@ -17,6 +44,9 @@ DEPENDENCIES
   dotenv
   pry
   pry-nav
+  sinatra
+  sinatra-reloader
+  thin
 
 BUNDLED WITH
    2.4.6
