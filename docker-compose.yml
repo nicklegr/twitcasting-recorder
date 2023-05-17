@@ -10,6 +10,7 @@ services:
     volumes:
       - ./conf:/conf
       - $OUTPUT_DIR:/output
+    user: "1000:1000"
 
   authenticator:
     build: .
