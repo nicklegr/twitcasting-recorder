@@ -89,7 +89,15 @@ loop do
 # pp pid_watchers
 $stdout.flush
 
-      user = get_json("/users/#{user_id}")
+      begin
+        user = get_json("/users/#{user_id}")
+      rescue Net::HTTPExceptions => e
+        puts "get_json(user_id: #{user_id}) failed"
+        puts e.message
+        puts e.response.body
+        next
+      end
+
       user => {user: {id:, screen_id:, name:, is_live:, last_movie_id:}}
       if !is_live
         sleep(SLEEP_SEC_PER_USER)
