@@ -52,21 +52,6 @@ def get_json(uri, header = {}, params = {}, body = "")
   JSON.parse(body, symbolize_names: true)
 end
 
-def get_hls_url(api_hls_url)
-  # &mode=source を付けるとソース画質のプレイリストが返ってくることがある
-  # 付けても変わらないこともある(音声のみの場合？)
-  body = Https.get(api_hls_url, {}, {
-    "video" => "1",
-    "mode" => "source",
-  })
-
-  # ビットレートが一番高いものを返す
-  playlists = body.scan(%r|BANDWIDTH=(\d+).+?(https://.+?\.m3u8)|m)
-  best_stream = playlists.max_by{|e| e[0].to_i}
-
-  best_stream[1]
-end
-
 Dotenv.load
 
 option = Option.new
@@ -119,15 +104,19 @@ $stdout.flush
       if !watcher || !watcher.status
         # 録画開始
         video_filename = "#{file_name_base}.ts"
-        playlist_url = get_hls_url(hls_url)
+        playlist_url = hls_url
         puts "recording video '#{video_filename}'"
         puts "playlist: #{playlist_url}"
 
+        # user_agentがデフォルトだとBad Requestになる
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
         video_recorder_pid = spawn(
           ffmpeg_path,
           "-hide_banner",
           "-loglevel",
           "warning",
+          "-user_agent",
+          user_agent,
           "-i",
           playlist_url,
           "-c",
